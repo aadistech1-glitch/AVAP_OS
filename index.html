@@ -1,0 +1,87 @@
+<html>
+<head>
+    <title>AVAP_OS</title>
+    <style>
+        body { background: #121212; color: #e0e0e0; font-family: monospace; padding: 20px; }
+        .box { background: #1a1a1a; border: 1px solid #2a2a2a; padding: 20px; margin-bottom: 20px; }
+        input { width: 100%; padding: 8px; background: #121212; border: 1px solid #2a2a2a; color: #fff; margin-bottom: 10px; }
+        button { width: 100%; padding: 10px; background: #2a2a2a; color: #fff; border: none; cursor: pointer; }
+        button:hover { background: #00ffff; color: #000; }
+        .hidden { display: none; }
+        .entry { padding: 8px 0; border-bottom: 1px dashed #2a2a2a; }
+    </style>
+</head>
+<body>
+
+    <!-- Auth Screen -->
+    <div id="login-screen" class="box" style="max-width: 300px; margin: 50px auto;">
+        <h3>Authorization</h3>
+        <input type="password" id="input-key" placeholder="Enter Master Key">
+        <button onclick="checkKey()">Unlock</button>
+    </div>
+
+    <!-- App Screen -->
+    <div id="app-screen" class="hidden">
+        <h2>AVAP_OS Dashboard</h2>
+        
+        <div class="box">
+            <h3>Add New Login</h3>
+            <input type="text" id="site-name" placeholder="Website Name">
+            <input type="text" id="site-pass" placeholder="Password">
+            <button onclick="addLogin()">Save</button>
+        </div>
+
+        <div class="box">
+            <h3>Stored Vault</h3>
+            <div id="vault-list"></div>
+        </div>
+    </div>
+
+<script>
+    // SET YOUR MASTER KEY HERE
+    const MASTER_KEY = "1234";
+
+    function checkKey() {
+        const entered = document.getElementById("input-key").value;
+        if (entered === MASTER_KEY) {
+            document.getElementById("login-screen").classList.add("hidden");
+            document.getElementById("app-screen").classList.remove("hidden");
+            showVault();
+        } else {
+            alert("Wrong key.");
+        }
+    }
+
+    function addLogin() {
+        const name = document.getElementById("site-name").value;
+        const pass = document.getElementById("site-pass").value;
+        
+        if (!name || !pass) return;
+
+        let vault = JSON.parse(localStorage.getItem("avap_simple_vault")) || [];
+        vault.push({ name, pass });
+        localStorage.setItem("avap_simple_vault", JSON.stringify(vault));
+
+        document.getElementById("site-name").value = "";
+        document.getElementById("site-pass").value = "";
+        showVault();
+    }
+
+    function showVault() {
+        const list = document.getElementById("vault-list");
+        let vault = JSON.parse(localStorage.getItem("avap_simple_vault")) || [];
+        
+        if (vault.length === 0) {
+            list.innerHTML = "Vault is empty.";
+            return;
+        }
+
+        list.innerHTML = "";
+        vault.forEach(function(item) {
+            list.innerHTML += "<div class='entry'><strong>" + item.name + "</strong>: " + item.pass + "</div>";
+        });
+    }
+</script>
+</body>
+</html>
+
